@@ -1,0 +1,12 @@
+contrib/pg_jieba/libjieba/README
+
+libjieba
+=======================
+
+This module uses the full-text search of Chinese by the jieba/cppjieba project,
+https://github.com/fxsjy/jieba
+https://github.com/yanyiwu/cppjieba
+which are released by them under a MIT license.
+
+The files under contrib/pg_jieba/libjieba/ are taken directly from
+their distribution

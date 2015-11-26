@@ -1,0 +1,11 @@
+contrib/pg_jieba/libjieba/CHANGELOG
+
+version of contrib/pg_jieba/libjieba/jieba direct from
+https://github.com/yanyiwu/cppjieba
+=======================
+
+commit a7df45df70d04f5a8457ab3f661793b681e0053f
+Author: yanyiwu <wuyanyi09@foxmail.com>
+Date:   Thu Nov 26 00:53:31 2015 +0800
+
+    v4.1.1
