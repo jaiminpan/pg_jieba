@@ -38,7 +38,30 @@ HOW TO USE & EXAMPLE
   (1 row)
   ```
 
-## Thanks
+## USER DEFINED DICTIONARY
+Reference [dictionary link](https://github.com/jaiminpan/pg_jieba/tree/master/dict/jieba.user.dict.utf8
+) for checking format
+
+  ```
+  cd /PATH/TO/POSTGRESQL_INSTALL/share/postgresql/tsearch_data
+  OR
+  cd /PATH/TO/POSTGRESQL_INSTALL/share/tsearch_data
+
+  cp 'YOUR DICTIONARY' jieba.user.dict.utf8
+  ```
+
+## NOTE
+It should work with PostgreSQL > 9.x
+Now only tested with PostgreSQL 9.4
+
+## ONLINE TEST
+You can test for result by following link (Suggest opened by Chrome)
+http://cppjieba-webdemo.herokuapp.com/
+
+## HISTORY
+https://github.com/jaiminpan/pg_jieba/blob/master/HISTORY
+
+## THANKS
 
 jieba project by SunJunyi
 https://github.com/fxsjy/jieba
