@@ -6,16 +6,17 @@ It implements by importing cppjieba.
 INSTALL
 -------
 
-1. Downloads
+1. **Downloads**
 
   ```
   git clone https://github.com/jaiminpan/pg_jieba
   ```
-2. Compile
+2. **Compile**
 
+  Make sure PostgreSQL is installed and command `pg_config` could be runnable.  
   ```
   cd pg_jieba
-  make && make install
+  USE_PGXS=1 make && make install
   ```
 
 HOW TO USE & EXAMPLE
