@@ -23,5 +23,7 @@ include $(top_builddir)/src/Makefile.global
 include $(top_srcdir)/contrib/contrib-global.mk
 endif
 
+CFLAGS_JB := $(filter-out -Wmissing-prototypes -Wdeclaration-after-statement -fexcess-precision=standard, $(CFLAGS))
+
 jieba.o: libjieba/jieba.cpp
-	g++ $(CFLAGS) $(CPPFLAGS) -DLOGGER_LEVEL=LL_WARN -o $@ -c $^
+	g++ $(CFLAGS_JB) $(CPPFLAGS) -DLOGGER_LEVEL=LL_WARN -o $@ -c $^
