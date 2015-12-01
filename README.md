@@ -2,6 +2,28 @@
 pg_jieba is a PostgreSQL extension for full-text search of Chinese.  
 It implements by importing cppjieba.  
 
+## NOTE
+It should work with PostgreSQL > 9.x  
+Now only tested with PostgreSQL 9.4  
+
+PREPARE
+-------
+Make sure PostgreSQL is installed and command `pg_config` could be runnable.   
+  
+Install Postgres:  
+
+* Option:  
+  download from http://www.postgresql.org/download/
+
+* Option:  
+  CentOS: 
+
+  ```
+  sudo yum install postgresql postgresql-server postgresql-devel
+  ```
+* Option:  
+  Download From http://www.enterprisedb.com/products-services-training/pgdownload
+
 
 INSTALL
 -------
@@ -12,14 +34,6 @@ INSTALL
   git clone https://github.com/jaiminpan/pg_jieba
   ```
 2. **Compile**
-
-  Make sure PostgreSQL is installed and command `pg_config` could be runnable.  
-  
-  CentOS: 
-  
-  ```
-  sudo yum install postgresql postgresql-server postgresql-devel
-  ```
   
   ```
   cd pg_jieba
@@ -57,10 +71,6 @@ Reference [dictionary link](https://github.com/jaiminpan/pg_jieba/tree/master/di
 
   cp 'YOUR DICTIONARY' jieba.user.dict.utf8
   ```
-
-## NOTE
-It should work with PostgreSQL > 9.x
-Now only tested with PostgreSQL 9.4
 
 ## ONLINE TEST
 You can test for result by following link (Suggest opened by Chrome)
