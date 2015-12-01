@@ -37,7 +37,10 @@ INSTALL
   
   ```
   cd pg_jieba
-  USE_PGXS=1 make && make install
+  USE_PGXS=1 make
+  USE_PGXS=1 make install 
+  # if got error when doing "USE_PGXS=1 make install"
+  # try "sudo USE_PGXS=1 make install"
   ```
 
 HOW TO USE & EXAMPLE
