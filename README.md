@@ -14,6 +14,13 @@ INSTALL
 2. **Compile**
 
   Make sure PostgreSQL is installed and command `pg_config` could be runnable.  
+  
+  CentOS: 
+  
+  ```
+  sudo yum install postgresql postgresql-server postgresql-devel
+  ```
+  
   ```
   cd pg_jieba
   USE_PGXS=1 make && make install
