@@ -30,4 +30,8 @@ CREATE TEXT SEARCH CONFIGURATION jiebacfg (PARSER = jieba);
 
 COMMENT ON TEXT SEARCH CONFIGURATION jiebacfg IS 'configuration for jieba';
 
-ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR n,v,a,d WITH simple;
+CREATE TEXT SEARCH DICTIONARY jieba_stem (TEMPLATE=simple, stopwords = 'jieba');
+
+COMMENT ON TEXT SEARCH DICTIONARY jieba_stem IS 'jieba dictionary: just lower case and check for stopword';
+
+ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR n,v,a,d WITH jieba_stem;

@@ -6,7 +6,8 @@ OBJS = pg_jieba.o \
 
 EXTENSION = pg_jieba
 DATA = pg_jieba--1.0.sql pg_jieba--unpackaged--1.0.sql
-DATA_TSEARCH = dict/jieba.dict.utf8 dict/jieba.hmm_model.utf8 dict/jieba.user.dict.utf8
+DATA_TSEARCH = dict/jieba.dict.utf8 dict/jieba.hmm_model.utf8 dict/jieba.user.dict.utf8 \
+		dict/jieba.stop
 
 REGRESS = pg_jieba
 
