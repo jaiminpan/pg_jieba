@@ -27,4 +27,4 @@ endif
 CFLAGS_JB := $(filter-out -Wmissing-prototypes -Wdeclaration-after-statement -fexcess-precision=standard, $(CFLAGS))
 
 jieba.o: libjieba/jieba.cpp
-	g++ $(CFLAGS_JB) $(CPPFLAGS) -DLOGGER_LEVEL=LL_WARN -o $@ -c $^
+	$(CXX) $(CFLAGS_JB) $(CPPFLAGS) -DLOGGER_LEVEL=LL_WARN -o $@ -c $^
