@@ -92,5 +92,3 @@ https://github.com/fxsjy/jieba
 
 cppjieba project by WuYanyi
 https://github.com/yanyiwu/cppjieba
-
-> Author: jaimin.pan@gmail.com    
