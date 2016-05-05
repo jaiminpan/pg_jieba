@@ -1,6 +1,7 @@
 # pg_jieba
-[![BSD](https://img.shields.io/badge/License-BSD-green.svg)]()
 [![Lang](https://img.shields.io/badge/Language-C%2FC%2B%2B-green.svg)]()
+[![BSD](https://img.shields.io/badge/License-BSD-green.svg)]()
+[![Extension](https://img.shields.io/badge/Extension-PostgreSQL-green.svg)]()
 
 pg_jieba is a PostgreSQL extension for full-text search of Chinese.  
 It implements by importing cppjieba.  
