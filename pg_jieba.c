@@ -12,7 +12,7 @@
  */
 #include "postgres.h"
 
-#include "libjieba/jieba.h"
+#include "cppjieba/Jieba.hpp"
 #include "miscadmin.h"
 #include "utils/guc.h"
 #include "utils/builtins.h"
@@ -88,9 +88,9 @@ Datum		jieba_lextype(PG_FUNCTION_ARGS);
 
 
 static JiebaCtx* jieba_ctx = NULL;
-static const char* DICT_PATH = "jieba.dict";
-static const char* HMM_PATH = "jieba.hmm_model";
-static const char* USER_DICT = "jieba.user.dict";
+static const char* DICT_PATH = "libjieba/dict/jieba.dict";
+static const char* HMM_PATH = "libjieba/dict/jieba.hmm_model";
+static const char* USER_DICT = "libjieba/dict/jieba.user.dict";
 static const char* EXT = "utf8";
 
 static char *jieba_get_tsearch_config_filename(const char *basename, const char *extension);
