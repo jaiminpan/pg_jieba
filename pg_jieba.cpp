@@ -28,7 +28,7 @@ extern "C" {
 }
 #endif
 
-#include "cppjieba/MixSegment.hpp"
+#include "cppjieba/Jieba.hpp"
 
 namespace pg_jieba {
 
@@ -197,14 +197,15 @@ Datum jieba_lextype(PG_FUNCTION_ARGS);
 }
 #endif
 
-static MixSegment* jieba = nullptr;
+static Jieba* jieba = nullptr;
 static unordered_map<string, int>* lex_id = nullptr;
 static const char* DICT_PATH = "jieba.dict";
 static const char* HMM_PATH = "jieba.hmm_model";
 static const char* USER_DICT = "jieba.user.dict";
-//static const char* IDF_PATH = "jieba.idf";
-//static const char* STOP_WORD_PATH = "jieba.stop_words";
+static const char* IDF_PATH = "jieba.idf";
+static const char* STOP_WORD_PATH = "jieba";
 static const char* EXT = "utf8";
+static const char* STOP_EXT = "stop";
 
 static char* jieba_get_tsearch_config_filename(const char *basename, const char *extension);
 
@@ -220,9 +221,11 @@ void _PG_init(void)
   /*
    init will take a few seconds to load dicts.
    */
-  jieba = new MixSegment(jieba_get_tsearch_config_filename(DICT_PATH, EXT),
-                         jieba_get_tsearch_config_filename(HMM_PATH, EXT),
-                         jieba_get_tsearch_config_filename(USER_DICT, EXT));
+  jieba = new Jieba(string(jieba_get_tsearch_config_filename(DICT_PATH, EXT)),
+                    string(jieba_get_tsearch_config_filename(HMM_PATH, EXT)),
+                    string(jieba_get_tsearch_config_filename(USER_DICT, EXT)),
+                    string(jieba_get_tsearch_config_filename(IDF_PATH, EXT)),
+                    string(jieba_get_tsearch_config_filename(STOP_WORD_PATH, STOP_EXT)));
   auto num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
   lex_id = new unordered_map<string, int>();
   for (auto i = 1; i < num_types; ++i) {
@@ -277,7 +280,11 @@ Datum jieba_gettoken(PG_FUNCTION_ARGS)
   }
 
   auto w = jieba->LookupTag(*cur_iter);
-  type = lex_id->at(w);
+  try {
+    type = lex_id->at(w);
+  } catch(...) {
+    type = lex_id->at("n");
+  }
   *tlen = static_cast<int>(cur_iter->length());
   *t = const_cast<char*>(cur_iter->c_str());
 
@@ -290,6 +297,7 @@ Datum jieba_end(PG_FUNCTION_ARGS)
   JiebaCtx* const ctx = reinterpret_cast<JiebaCtx*>(PG_GETARG_POINTER(0));
   if (ctx->words != nullptr) {
     delete ctx->words;
+    ctx->words = nullptr;
   }
   pfree(ctx);
   PG_RETURN_VOID();

@@ -7,7 +7,6 @@ set(PG_JIEBA_PROJECT_ID "pg_jieba")
 project("${PG_JIEBA_PROJECT_ID}")
 
 message(STATUS "Setting ${CMAKE_PROJECT_NAME} build type - ${CMAKE_BUILD_TYPE}")
-set(CMAKE_CXX_FLAGS -fno-exceptions)
 
 find_package(PostgreSQL REQUIRED)
 if(NOT PostgreSQL_FOUND)
@@ -126,8 +125,7 @@ install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/stop_words.utf8"
         RENAME "jieba.stop"
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
-# Not used for now
-#install(FILES
-#        "${PROJECT_SOURCE_DIR}/libjieba/dict/idf.utf8"
-#        RENAME "jieba.idf.utf8"
-#        DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
+install(FILES
+        "${PROJECT_SOURCE_DIR}/libjieba/dict/idf.utf8"
+        RENAME "jieba.idf.utf8"
+        DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
