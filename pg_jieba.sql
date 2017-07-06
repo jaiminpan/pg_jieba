@@ -34,4 +34,4 @@ CREATE TEXT SEARCH DICTIONARY jieba_stem (TEMPLATE=simple, stopwords = 'jieba');
 
 COMMENT ON TEXT SEARCH DICTIONARY jieba_stem IS 'jieba dictionary: just lower case and check for stopword';
 
-ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR n,v,a,d WITH jieba_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
