@@ -185,6 +185,9 @@ void    _PG_fini(void);
 PG_FUNCTION_INFO_V1(jieba_start);
 Datum jieba_start(PG_FUNCTION_ARGS);
 
+PG_FUNCTION_INFO_V1(jieba_query_start);
+Datum jieba_query_start(PG_FUNCTION_ARGS);
+
 PG_FUNCTION_INFO_V1(jieba_gettoken);
 Datum jieba_gettoken(PG_FUNCTION_ARGS);
 
@@ -221,11 +224,11 @@ void _PG_init(void)
   /*
    init will take a few seconds to load dicts.
    */
-  jieba = new Jieba(string(jieba_get_tsearch_config_filename(DICT_PATH, EXT)),
-                    string(jieba_get_tsearch_config_filename(HMM_PATH, EXT)),
-                    string(jieba_get_tsearch_config_filename(USER_DICT, EXT)),
-                    string(jieba_get_tsearch_config_filename(IDF_PATH, EXT)),
-                    string(jieba_get_tsearch_config_filename(STOP_WORD_PATH, STOP_EXT)));
+  jieba = new Jieba(jieba_get_tsearch_config_filename(DICT_PATH, EXT),
+                    jieba_get_tsearch_config_filename(HMM_PATH, EXT),
+                    jieba_get_tsearch_config_filename(USER_DICT, EXT),
+                    jieba_get_tsearch_config_filename(IDF_PATH, EXT),
+                    jieba_get_tsearch_config_filename(STOP_WORD_PATH, STOP_EXT));
   auto num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
   lex_id = new unordered_map<string, int>();
   for (auto i = 1; i < num_types; ++i) {
@@ -255,6 +258,19 @@ Datum jieba_start(PG_FUNCTION_ARGS)
                  static_cast<unsigned long>(PG_GETARG_INT32(1)));
   auto words = new vector<string>();
   jieba->Cut(str, *words);
+
+  JiebaCtx* const ctx = static_cast<JiebaCtx*>(palloc0(sizeof(JiebaCtx)));
+  ctx->words = words;
+  ctx->iter = words->begin();
+  PG_RETURN_POINTER(ctx);
+}
+
+Datum jieba_query_start(PG_FUNCTION_ARGS)
+{
+  string str(static_cast<char*>(PG_GETARG_POINTER(0)),
+             static_cast<unsigned long>(PG_GETARG_INT32(1)));
+  auto words = new vector<string>();
+  jieba->CutForSearch(str, *words);
 
   JiebaCtx* const ctx = static_cast<JiebaCtx*>(palloc0(sizeof(JiebaCtx)));
   ctx->words = words;
