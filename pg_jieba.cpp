@@ -35,15 +35,6 @@ namespace pg_jieba {
 using namespace cppjieba;
 using namespace std;
 
-/* Output token categories */
-#define JB_A      1
-#define JB_N      2
-#define JB_V      3
-#define JB_D      4
-
-/* Start From 1 and LASTNUM is the last number */
-#define LASTNUM      4
-
 static const char* const tok_alias[] = {
   "",
   "nz",
@@ -200,15 +191,67 @@ Datum jieba_lextype(PG_FUNCTION_ARGS);
 }
 #endif
 
-static Jieba* jieba = nullptr;
-static unordered_map<string, int>* lex_id = nullptr;
+/* wrapper class for all we used */
+class PgJieba {
+public:
+  PgJieba(const string& dict_path,
+          const string& model_path,
+          const string& user_dict_path)
+    : dict_trie_(dict_path, user_dict_path),
+      hmm_model_(model_path),
+      mix_seg_(&dict_trie_, &hmm_model_),
+      query_seg_(&dict_trie_, &hmm_model_) {
+    auto num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
+    for (auto i = 1; i < num_types; ++i) {
+      lex_id_.insert({tok_alias[i], i});
+    }
+  }
+
+  void Cut(const string& sentence, vector<string>& words, bool hmm = true) const {
+    mix_seg_.Cut(sentence, words, hmm);
+  }
+  void Cut(const string& sentence, vector<Word>& words, bool hmm = true) const {
+    mix_seg_.Cut(sentence, words, hmm);
+  }
+
+  void CutForSearch(const string& sentence, vector<string>& words, bool hmm = true) const {
+    query_seg_.Cut(sentence, words, hmm);
+  }
+  void CutForSearch(const string& sentence, vector<Word>& words, bool hmm = true) const {
+    query_seg_.Cut(sentence, words, hmm);
+  }
+
+  string LookupTag(const string &str) const {
+    return mix_seg_.LookupTag(str);
+  }
+
+  int LookupLexTypeId(const string &str) const {
+    try {
+      return lex_id_.at(this->LookupTag(str));
+    } catch(...) {
+      return lex_id_.at("n");
+    }
+  }
+
+  int GetLexTypeSize() const {
+    return lex_id_.size();
+  }
+
+private:
+  DictTrie dict_trie_;
+  HMMModel hmm_model_;
+
+  // They share the same dict trie and model
+  MixSegment mix_seg_;
+  QuerySegment query_seg_;
+  unordered_map<string, int> lex_id_;
+}; // class PgJieba
+
+static PgJieba* jieba = nullptr;
 static const char* DICT_PATH = "jieba.dict";
 static const char* HMM_PATH = "jieba.hmm_model";
 static const char* USER_DICT = "jieba.user.dict";
-static const char* IDF_PATH = "jieba.idf";
-static const char* STOP_WORD_PATH = "jieba";
 static const char* EXT = "utf8";
-static const char* STOP_EXT = "stop";
 
 static char* jieba_get_tsearch_config_filename(const char *basename, const char *extension);
 
@@ -217,23 +260,16 @@ static char* jieba_get_tsearch_config_filename(const char *basename, const char 
  */
 void _PG_init(void)
 {
-  if (jieba != nullptr || lex_id != nullptr) {
+  if (jieba != nullptr) {
     return;
   }
 
   /*
    init will take a few seconds to load dicts.
    */
-  jieba = new Jieba(jieba_get_tsearch_config_filename(DICT_PATH, EXT),
-                    jieba_get_tsearch_config_filename(HMM_PATH, EXT),
-                    jieba_get_tsearch_config_filename(USER_DICT, EXT),
-                    jieba_get_tsearch_config_filename(IDF_PATH, EXT),
-                    jieba_get_tsearch_config_filename(STOP_WORD_PATH, STOP_EXT));
-  auto num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
-  lex_id = new unordered_map<string, int>();
-  for (auto i = 1; i < num_types; ++i) {
-    lex_id->insert({tok_alias[i], i});
-  }
+  jieba = new PgJieba(jieba_get_tsearch_config_filename(DICT_PATH, EXT),
+                      jieba_get_tsearch_config_filename(HMM_PATH, EXT),
+                      jieba_get_tsearch_config_filename(USER_DICT, EXT));
 }
 
 /*
@@ -241,11 +277,9 @@ void _PG_init(void)
  */
 void _PG_fini(void)
 {
-  if (jieba != nullptr || lex_id != nullptr) {
+  if (jieba != nullptr) {
     delete jieba;
     jieba = nullptr;
-    delete lex_id;
-    lex_id = nullptr;
   }
 }
 
@@ -295,12 +329,7 @@ Datum jieba_gettoken(PG_FUNCTION_ARGS)
     PG_RETURN_INT32(type);
   }
 
-  auto w = jieba->LookupTag(*cur_iter);
-  try {
-    type = lex_id->at(w);
-  } catch(...) {
-    type = lex_id->at("n");
-  }
+  type = jieba->LookupLexTypeId(*cur_iter);
   *tlen = static_cast<int>(cur_iter->length());
   *t = const_cast<char*>(cur_iter->c_str());
 
@@ -321,7 +350,7 @@ Datum jieba_end(PG_FUNCTION_ARGS)
 
 Datum jieba_lextype(PG_FUNCTION_ARGS)
 {
-  auto size = lex_id->size();
+  auto size = jieba->GetLexTypeSize();
   LexDescr *descr = static_cast<LexDescr*>(palloc(sizeof(LexDescr) * size));
 
   for (int i = 1; i <= size; i++) {
