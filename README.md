@@ -8,7 +8,7 @@ It implements by importing cppjieba.
 
 ## NOTE
 It should work with PostgreSQL > 9.x  
-Now only tested with PostgreSQL 9.4  
+It is tested with PostgreSQL 9.6.3 on CentOS  
 
 PREPARE
 -------
@@ -37,14 +37,31 @@ INSTALL
   ```
   git clone https://github.com/jaiminpan/pg_jieba
   ```
-2. **Compile**
+
+2. **Init submodule**
+  ```
+  cd pg_jieba
+
+  # initilized sub-project
+  git submodule update --init --recursive
+  ```
+
+3. **Compile**
   
   ```
   cd pg_jieba
-  USE_PGXS=1 make
-  USE_PGXS=1 make install 
-  # if got error when doing "USE_PGXS=1 make install"
-  # try "sudo USE_PGXS=1 make install"
+
+  mkdir build
+  cd build
+
+  cmake ..
+  # if postgresql is installed customized, Try cmd like following  
+  # cmake -DCMAKE_PREFIX_PATH=/PATH/TO/PGSQL_INSTALL_DIR ..
+
+  make
+  make install 
+  # if got error when doing "make install"
+  # try "sudo make install"
   ```
 
 HOW TO USE & EXAMPLE
