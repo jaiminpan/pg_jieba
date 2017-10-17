@@ -89,9 +89,14 @@ HOW TO USE & EXAMPLE
   ```
 
 ## USER DEFINED DICTIONARY
-Reference [dictionary link](https://github.com/jaiminpan/pg_jieba/tree/master/dict/jieba.user.dict.utf8
-) for checking format
+jieba.user.dict.utf8
+  ```
+  云计算
+  韩玉鉴赏
+  蓝翔 nz
+  ```
 
+operation
   ```
   cd /PATH/TO/POSTGRESQL_INSTALL/share/postgresql/tsearch_data
   OR
