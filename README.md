@@ -59,8 +59,10 @@ INSTALL
   cd build
 
   cmake ..
-  # if postgresql is installed customized, Try cmd like following  
+  # If postgresql is installed customized, Try cmd as following  
   # cmake -DCMAKE_PREFIX_PATH=/PATH/TO/PGSQL_INSTALL_DIR ..
+  # In some OS like Ubuntu. Try cmd as following may solve the compiling problem 
+  # cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" ..
 
   make
   make install 
