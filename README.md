@@ -61,6 +61,8 @@ INSTALL
   cmake ..
   # If postgresql is installed customized, Try cmd as following  
   # cmake -DCMAKE_PREFIX_PATH=/PATH/TO/PGSQL_INSTALL_DIR ..
+  # Ubuntu, To specify version of pg(missing: PostgreSQL_TYPE_INCLUDE_DIR)
+  # cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/10/server ..
   # In some OS like Ubuntu. Try cmd as following may solve the compiling problem 
   # cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" ..
 
