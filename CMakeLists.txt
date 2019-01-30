@@ -13,15 +13,14 @@ if(NOT PostgreSQL_FOUND)
     message(FATAL_ERROR " Please check your PostgreSQL installation.")
 endif(NOT PostgreSQL_FOUND)
 
+
 include_directories(${PostgreSQL_INCLUDE_DIRS})
 link_directories(${PostgreSQL_LIBRARY_DIRS})
 
 set(CPPJIEBA_DIR "libjieba")
-INCLUDE_DIRECTORIES(${CPPJIEBA_DIR}/deps
-        ${CPPJIEBA_DIR}/include)
+INCLUDE_DIRECTORIES(${CPPJIEBA_DIR}/deps ${CPPJIEBA_DIR}/include)
 
-set(SOURCE_FILES
-    pg_jieba.cpp)
+set(SOURCE_FILES pg_jieba.c jieba.cpp)
 
 set(PG_JIEBA_POSTGRESQL_DIR "${CMAKE_INSTALL_PREFIX}"
         CACHE PATH "PostgreSQL binary directory")
@@ -31,9 +30,25 @@ set(PG_JIEBA_POSTGRESQL_VERSION "unknown"
 set(PG_JIEBA_DLL_NAME "pg_jieba")
 set(PG_JIEBA_LIBRARY_NAME "${PG_JIEBA_DLL_NAME}")
 
+if(DEBUG_MODE)
+    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -O0 -g")
+    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
+endif(DEBUG_MODE)
+
 find_program(PostgreSQL_PG_CONFIG NAMES pg_config
         PATHS
         /usr/lib/postgresql/*/bin/)
+
+execute_process(COMMAND ${PostgreSQL_PG_CONFIG} --cflags
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                OUTPUT_VARIABLE PG_CFLAGS)
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${PG_CFLAGS}")
+
+execute_process(COMMAND ${PostgreSQL_PG_CONFIG} --cppflags
+                OUTPUT_STRIP_TRAILING_WHITESPACE
+                OUTPUT_VARIABLE PG_CPPFLAGS)
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${PG_CPPFLAGS}")
+
 execute_process(
         COMMAND ${PostgreSQL_PG_CONFIG} --pkglibdir
         OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -55,6 +70,7 @@ set(PG_JIEBA_SEARCH_DATA_DIR "${PG_SHARE_DIR}/tsearch_data")
 execute_process(COMMAND ${PostgreSQL_PG_CONFIG} --bindir
                 OUTPUT_STRIP_TRAILING_WHITESPACE
                 OUTPUT_VARIABLE T_POSTGRESQL_BIN)
+
 
 # Checking POSTGRESQL_EXECUTABLE in all the dir (*) - implies that
 find_program(PostgreSQL_EXECUTABLE NAMES postgres
