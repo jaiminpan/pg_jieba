@@ -1,23 +1,24 @@
 # pg_jieba
 [![Lang](https://img.shields.io/badge/Language-C%2FC%2B%2B-green.svg)]()
 [![BSD](https://img.shields.io/badge/License-BSD-green.svg)]()
-[![Extension](https://img.shields.io/badge/Extension-PostgreSQL-green.svg)]()
+[![Extension](https://img.shields.io/badge/PostgreSQL_9.x-Extension-green.svg)]()
+[![Extension](https://img.shields.io/badge/PostgreSQL_10.x-Extension-green.svg)]()
+[![Extension](https://img.shields.io/badge/PostgreSQL_11.x-Extension-green.svg)]()
 
 pg_jieba is a PostgreSQL extension for full-text search of Chinese.  
 It implements by importing cppjieba.  
 
 ## NOTE
-It should work with PostgreSQL > 9.x  
-It is tested with PostgreSQL 9.6.3 on CentOS 7  
+It is tested on [![Extension](https://img.shields.io/badge/PostgreSQL9.6.3-CentOS_7-green.svg)]() [![Extension](https://img.shields.io/badge/PostgreSQL11.1-MacOS_Mojave-green.svg)]()  
 
-**The master branch require C++11(gcc4.8+), because the new version of cppjieba upgrade to C++11.**  
-**If the OS compiler did not support C++11, please try old version of pg_jieba like v1.0.1**
+**This branch require C++11(gcc4.8+), because the new version of cppjieba upgrade to C++11.**  
+**If the OS compiler did not support C++11, please try old version of pg_jieba as branch v1.0.1**
 
 
 PREPARE
 -------
 Make sure PostgreSQL is installed and command `pg_config` could be runnable.   
-  
+
 Install Postgres:  
 
 * Option:  
@@ -36,13 +37,13 @@ Install Postgres:
 INSTALL
 -------
 
-1. **Downloads**
+#### 1. Downloads
 
   ```
   git clone https://github.com/jaiminpan/pg_jieba
   ```
 
-2. **Init submodule**
+#### 2. Init submodule
   ```
   cd pg_jieba
 
@@ -50,27 +51,33 @@ INSTALL
   git submodule update --init --recursive
   ```
 
-3. **Compile**
-  
-  ```
+#### 3. Compile
+
+  ```sh
   cd pg_jieba
 
   mkdir build
   cd build
 
   cmake ..
-  # If postgresql is installed customized, Try cmd as following  
-  # cmake -DCMAKE_PREFIX_PATH=/PATH/TO/PGSQL_INSTALL_DIR ..
-  # Ubuntu, To specify version of pg(missing: PostgreSQL_TYPE_INCLUDE_DIR)
-  # cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/10/server ..
-  # In some OS like Ubuntu. Try cmd as following may solve the compiling problem 
-  # cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" ..
-
+  
   make
   make install 
   # if got error when doing "make install"
   # try "sudo make install"
   ```
+  ##### Compile Failed Q&A
+  Q: Postgresql is installed customized
+  A: Try cmd as following
+     `cmake -DCMAKE_PREFIX_PATH=/PATH/TO/PGSQL_INSTALL_DIR ..`
+
+  Q: Ubuntu, To specify version of pg(missing: PostgreSQL_TYPE_INCLUDE_DIR)
+  A: `cmake -DPostgreSQL_TYPE_INCLUDE_DIR=/usr/include/postgresql/10/server ..`
+
+  Q: In some OS such as Ubuntu.
+  A: Try cmd as following
+     `cmake -DCMAKE_CXX_FLAGS="-Wall -std=c++11" ..`
+
 
 HOW TO USE & EXAMPLE
 -------
