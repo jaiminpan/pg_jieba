@@ -13,8 +13,10 @@
 
 #include "postgres.h"
 
+#include "lib/stringinfo.h"
 #include "utils/guc.h"
 #include "utils/elog.h"
+#include "utils/varlena.h"
 #include "miscadmin.h"
 #include "tsearch/ts_public.h"
 
@@ -59,13 +61,28 @@ PG_FUNCTION_INFO_V1(jieba_lextype);
 Datum jieba_lextype(PG_FUNCTION_ARGS);
 
 
-static JiebaCtx* jieba = NULL;
-static const char* DICT_PATH = "jieba.dict";
-static const char* HMM_PATH = "jieba.hmm_model";
-static const char* USER_DICT = "jieba.user.dict";
-static const char* EXT = "utf8";
+#define DICT_EXT "dict"
+#define MODEL_EXT "model"
 
+static void recompute_dicts_path(void);
+static char* extract_dict_list(const char *dictsString);
 static char* jieba_get_tsearch_config_filename(const char *basename, const char *extension);
+
+static JiebaCtx* jieba = NULL;
+
+/* GUC variables */
+static char *pg_jieba_hmm_model = NULL;
+static char *pg_jieba_dict = NULL;
+static char *pg_jieba_user_dict = NULL;
+
+/* These variables are the values last set */
+static char *userDicts = NULL;
+
+/* The above values are valid only if userDictsValid */
+static bool userDictsValid = true;
+
+static bool check_user_dict(char **newval, void **extra, GucSource source);
+static void assign_user_dict(const char *newval, void *extra);
 
 /*
  * Module load callback
@@ -73,16 +90,38 @@ static char* jieba_get_tsearch_config_filename(const char *basename, const char 
 void
 _PG_init(void)
 {
-	if (jieba) {
-		return;
-	}
+	DefineCustomStringVariable("pg_jieba.hmm_model",
+							"hmm model file.",
+							NULL,
+							&pg_jieba_hmm_model,
+							"jieba_hmm",
+							PGC_POSTMASTER, 0,
+							NULL,
+							NULL,
+							NULL);
 
-	/*
-	 init will take a few seconds to load dicts.
-	 */
-	jieba = Jieba_New(jieba_get_tsearch_config_filename(DICT_PATH, EXT),
-					  jieba_get_tsearch_config_filename(HMM_PATH, EXT),
-					  jieba_get_tsearch_config_filename(USER_DICT, EXT));
+	DefineCustomStringVariable("pg_jieba.base_dict",
+							"base dictionary.",
+							NULL,
+							&pg_jieba_dict,
+							"jieba_base",
+							PGC_POSTMASTER, 0,
+							NULL,
+							NULL,
+							NULL);
+
+	DefineCustomStringVariable("pg_jieba.user_dict",
+							"CSV list of specific user dictionary.",
+							NULL,
+							&pg_jieba_user_dict,
+							"jieba_user",
+							PGC_POSTMASTER, 0,
+							check_user_dict,
+							assign_user_dict,
+							NULL);
+
+	userDictsValid = false;
+	recompute_dicts_path();
 }
 
 /*
@@ -187,6 +226,106 @@ jieba_lextype(PG_FUNCTION_ARGS)
 	PG_RETURN_POINTER(descr);
 }
 
+static void
+recompute_dicts_path(void)
+{
+	MemoryContext oldcxt;
+	char	   *user_dicts;
+	char	   *new_dicts;
+
+	JiebaCtx   *new_jieba = NULL;
+	char* dict_path;
+	char* hmm_model_path;
+
+	/* Do nothing if path is already valid. */
+	if (userDictsValid)
+		return;
+
+	dict_path = jieba_get_tsearch_config_filename(pg_jieba_dict, DICT_EXT);
+	hmm_model_path = jieba_get_tsearch_config_filename(pg_jieba_hmm_model, MODEL_EXT);
+	user_dicts = extract_dict_list(pg_jieba_user_dict);
+
+	/*
+	 * Now that we've successfully built the new,
+	 * save it in permanent storage.
+	 */
+	oldcxt = MemoryContextSwitchTo(TopMemoryContext);
+	{
+		new_dicts = pstrdup(user_dicts);
+
+		/*
+		 init will take a few seconds to load dicts.
+		 */
+		new_jieba = Jieba_New(dict_path, hmm_model_path, new_dicts);
+	}
+	MemoryContextSwitchTo(oldcxt);
+
+	/* Now safe to assign to state variables. */
+	if (userDicts)
+		pfree(userDicts);
+	userDicts = new_dicts;
+
+	if (jieba) {
+		Jieba_Free(jieba);
+		jieba = NULL;
+	}
+	jieba = new_jieba;
+
+	/* Mark the path valid. */
+	userDictsValid = true;
+
+	/* Clean up. */
+	pfree(user_dicts);
+	pfree(dict_path);
+	pfree(hmm_model_path);
+}
+
+/* check_hook: validate new value */
+static bool
+check_user_dict(char **newval, void **extra, GucSource source)
+{
+	char	   *rawname;
+	List	   *namelist;
+
+	/* Need a modifiable copy of string */
+	rawname = pstrdup(*newval);
+
+	/* Parse string into list of identifiers */
+	if (!SplitIdentifierString(rawname, ',', &namelist))
+	{
+		/* syntax error in name list */
+		GUC_check_errdetail("List syntax is invalid.");
+		pfree(rawname);
+		list_free(namelist);
+		return false;
+	}
+
+	/*
+	 * We used to try to check that the named schemas exist, but there are
+	 * many valid use-cases for having search_path settings that include
+	 * schemas that don't exist; and often, we are not inside a transaction
+	 * here and so can't consult the system catalogs anyway.  So now, the only
+	 * requirement is syntactic validity of the identifier list.
+	 */
+
+	pfree(rawname);
+	list_free(namelist);
+
+	return true;
+}
+
+/* assign_hook: do extra actions as needed */
+static void
+assign_user_dict(const char *newval, void *extra)
+{
+	/*
+	 * We mark the path as needing recomputation, but don't do anything until
+	 * it's needed.  This avoids trying to do database access during GUC
+	 * initialization, or outside a transaction.
+	 */
+//	userDictsValid = false;
+}
+
 /*
  * Given the base name and extension of a tsearch config file, return
  * its full path name.  The base name is assumed to be user-supplied,
@@ -223,4 +362,55 @@ jieba_get_tsearch_config_filename(const char *basename,
 			 sharepath, basename, extension);
 
 	return result;
+}
+
+/*
+ * The result is a palloc'd string.
+ */
+static char *
+extract_dict_list(const char *dictsString)
+{
+	List	   *elemlist;
+	ListCell   *lc;
+	char       *rawstring;
+
+	bool		first;
+	StringInfoData bufdata;
+	StringInfo buf = &bufdata;
+
+	initStringInfo(&bufdata);
+
+	rawstring = pstrdup(dictsString);
+
+	// Parse string into list of identifiers
+	if (!SplitIdentifierString(rawstring, ',', &elemlist)) {
+		// syntax error in list
+		pfree(rawstring);
+		list_free(elemlist);
+		ereport(LOG,
+				(errcode(ERRCODE_SYNTAX_ERROR),
+				 errmsg("parameter must be a list of dictionary")));
+		return NULL;
+	}
+
+	first = true;
+	foreach(lc, elemlist)
+	{
+		const char *dict_name = (const char *) lfirst(lc);
+		char* dict_path = jieba_get_tsearch_config_filename(dict_name, DICT_EXT);
+
+		if (!first)
+			appendStringInfoString(buf, ";");
+
+		appendStringInfoString(buf, dict_path);
+
+		pfree(dict_path);
+
+		first = false;
+	}
+
+	list_free(elemlist);
+	pfree(rawstring);
+
+	return buf->data;
 }

@@ -128,14 +128,15 @@ install(FILES
         DESTINATION "${PG_JIEBA_EXTENSION_DATA_DIR}")
 install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/jieba.dict.utf8"
+        RENAME "jieba_base.dict"
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
 install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/hmm_model.utf8"
-        RENAME "jieba.hmm_model.utf8"
+        RENAME "jieba_hmm.model"
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
 install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/user.dict.utf8"
-        RENAME "jieba.user.dict.utf8"
+        RENAME "jieba_user.dict"
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
 install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/stop_words.utf8"
@@ -143,5 +144,5 @@ install(FILES
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")
 install(FILES
         "${PROJECT_SOURCE_DIR}/libjieba/dict/idf.utf8"
-        RENAME "jieba.idf.utf8"
+        RENAME "jieba.idf"
         DESTINATION "${PG_JIEBA_SEARCH_DATA_DIR}")

@@ -161,8 +161,6 @@ jieba=# select * from ts_debug('jiebacfg', '是拖拉机学院手扶拖拉机专
 (17 rows)
 ```
 
-
-
 ## USER DEFINED DICTIONARY
 #### Dictionary Format
 + Words  weight  type
@@ -174,7 +172,7 @@ jieba=# select * from ts_debug('jiebacfg', '是拖拉机学院手扶拖拉机专
   蓝翔 nz
   区块链 10 nz
   ```
-Reference `jieba.user.dict.utf8`
+Reference `jieba_user.dict`
 
 #### How to use your own dictionary
   ```
@@ -182,13 +180,24 @@ Reference `jieba.user.dict.utf8`
   OR
   cd /PATH/TO/POSTGRESQL_INSTALL/share/tsearch_data
 
-  cp 'YOUR DICTIONARY' jieba.user.dict.utf8
+  cp 'YOUR DICTIONARY' jieba_user.dict
   ```
 
 #### Dictionary Sharing
 
 + [dict.367W.utf8] iLife
 
+
+## Parameter
+The following configuration options are available to add into postgresql.conf
+
++ **pg_jieba.hmm_model** (Need Restart)
+HMM Model file.
++ **pg_jieba.base_dict** (Need Restart)
+Base dictionary.
++ **pg_jieba.user_dict** (Need Restart)
+csv list of specific user dictionary name(Exclude suffix `.dict`).
+All should located in dir `tsearch_data`.
 
 ## Online Test
 You can test for result by [test link] (Suggest opened by Chrome)
