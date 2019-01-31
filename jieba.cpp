@@ -33,6 +33,8 @@ struct JiebaCtx
 	// They share the same dict trie and model
 	MixSegment* mix_seg_;
 	QuerySegment* query_seg_;
+	MPSegment* mp_seg_;
+	HMMSegment* hmm_seg_;
 
 	unordered_map<string, int> lex_id_;
 };
@@ -54,6 +56,8 @@ Jieba_New(const char* dict_path, const char* model_path, const char* user_dict_p
 	ctx->hmm_model_ = new HMMModel(model_path);
 	ctx->mix_seg_ = new MixSegment(ctx->dict_trie_, ctx->hmm_model_);
 	ctx->query_seg_ = new QuerySegment(ctx->dict_trie_, ctx->hmm_model_);
+	ctx->mp_seg_ = new MPSegment(ctx->dict_trie_);
+	ctx->hmm_seg_ = new HMMSegment(ctx->hmm_model_);
 
 	int num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
 	for (auto i = 1; i < num_types; ++i) {
@@ -68,6 +72,9 @@ Jieba_Free(JiebaCtx* ctx)
 {
 	delete ctx->mix_seg_;
 	delete ctx->query_seg_;
+	delete ctx->mp_seg_;
+	delete ctx->hmm_seg_;
+
 	delete ctx->dict_trie_;
 	delete ctx->hmm_model_;
 
@@ -75,27 +82,30 @@ Jieba_Free(JiebaCtx* ctx)
 }
 
 ParStat *
-Jieba_Cut(JiebaCtx* ctx, const char* str, int len)
+Jieba_Cut(JiebaCtx* ctx, const char* str, int len, int mode)
 {
-	SegmentBase* x = (SegmentBase*) ctx->mix_seg_;
+	SegmentBase* x;
+
 	string sentence(str, len);
 	vector<string> *words = new vector<string>();
 
-	x->Cut(sentence, *words);
-
-	ParStat* stat = ParStat_New();
-	stat->words = words;
-	stat->iter = words->begin();
-
-	return stat;
-}
-
-ParStat *
-Jieba_CutForSearch(JiebaCtx* ctx, const char* str, int len)
-{
-	SegmentBase* x = (SegmentBase*) ctx->query_seg_;
-	string sentence(str, len);
-	vector<string> *words = new vector<string>();
+	switch (mode) {
+		case MODE_MIX:
+			x = (SegmentBase*) ctx->mix_seg_;
+			break;
+		case MODE_MP:
+			x = (SegmentBase*) ctx->mp_seg_;
+			break;
+		case MODE_HMM:
+			x = (SegmentBase*) ctx->hmm_seg_;
+			break;
+		case MODE_QRY:
+			x = (SegmentBase*) ctx->query_seg_;
+			break;
+		default:
+			x = (SegmentBase*) ctx->mix_seg_;
+			break;
+	}
 
 	x->Cut(sentence, *words);
 

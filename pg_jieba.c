@@ -51,6 +51,12 @@ Datum jieba_start(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(jieba_query_start);
 Datum jieba_query_start(PG_FUNCTION_ARGS);
 
+PG_FUNCTION_INFO_V1(jieba_mp_start);
+Datum jieba_mp_start(PG_FUNCTION_ARGS);
+
+PG_FUNCTION_INFO_V1(jieba_hmm_start);
+Datum jieba_hmm_start(PG_FUNCTION_ARGS);
+
 PG_FUNCTION_INFO_V1(jieba_gettoken);
 Datum jieba_gettoken(PG_FUNCTION_ARGS);
 
@@ -83,6 +89,7 @@ static bool userDictsValid = true;
 
 static bool check_user_dict(char **newval, void **extra, GucSource source);
 static void assign_user_dict(const char *newval, void *extra);
+
 
 /*
  * Module load callback
@@ -148,7 +155,7 @@ jieba_start(PG_FUNCTION_ARGS)
 
 	pst->ctx = jieba;
 
-	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len);
+	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len, MODE_MIX);
 
 	PG_RETURN_POINTER(pst);
 }
@@ -162,7 +169,35 @@ jieba_query_start(PG_FUNCTION_ARGS)
 
 	pst->ctx = jieba;
 
-	pst->stat = Jieba_CutForSearch(pst->ctx, pst->buffer, pst->len);
+	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len, MODE_QRY);
+
+	PG_RETURN_POINTER(pst);
+}
+
+Datum
+jieba_mp_start(PG_FUNCTION_ARGS)
+{
+	ParserState* const pst = (ParserState *) palloc0(sizeof(ParserState));
+	pst->buffer = (char *) PG_GETARG_POINTER(0);
+	pst->len = PG_GETARG_INT32(1);
+
+	pst->ctx = jieba;
+
+	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len, MODE_MP);
+
+	PG_RETURN_POINTER(pst);
+}
+
+Datum
+jieba_hmm_start(PG_FUNCTION_ARGS)
+{
+	ParserState* const pst = (ParserState *) palloc0(sizeof(ParserState));
+	pst->buffer = (char *) PG_GETARG_POINTER(0);
+	pst->len = PG_GETARG_INT32(1);
+
+	pst->ctx = jieba;
+
+	pst->stat = Jieba_Cut(pst->ctx, pst->buffer, pst->len, MODE_HMM);
 
 	PG_RETURN_POINTER(pst);
 }

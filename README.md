@@ -81,40 +81,10 @@ INSTALL
 HOW TO USE & EXAMPLE
 -------
 
-Here is alternative configs;
-* **jiebacfg:** Used in most situation (Recommand)
-* **jiebaqry:** Similar to the one used by web search engines.
-
-```sh
-jieba=# select * from to_tsquery('jiebacfg', '我来到北京清华大学');
-          to_tsquery
-------------------------------
- '来到' & '北京' & '清华大学'
-(1 row)
-
-jieba=# select * from to_tsquery('jiebaqry', '我来到北京清华大学');
-                       to_tsquery
----------------------------------------------------------
- '来到' & '北京' & '清华' & '华大' & '大学' & '清华大学'
-(1 row)
-```
-
 #### General
   ```sh
   jieba=# create extension pg_jieba;
   CREATE EXTENSION
-
-  jieba=#  select * from to_tsvector('jiebacfg', '小明硕士毕业于中国科学院计算所，后在日本京都大学深造');
-                                                   to_tsvector
-  --------------------------------------------------------------------------------------------------------------
-   '中国科学院':5 '于':4 '后':8 '在':9 '小明':1 '日本京都大学':10 '毕业':3 '深造':11 '硕士':2 '计算所':6 '，':7
-  (1 row)
-
-  jieba=#  select * from to_tsvector('jiebacfg', '李小福是创新办主任也是云计算方面的专家');
-                                          to_tsvector
-  -------------------------------------------------------------------------------------------
-   '专家':11 '主任':5 '也':6 '云计算':8 '创新':3 '办':4 '方面':9 '是':2,7 '李小福':1 '的':10
-  (1 row)
 
   jieba=# select * from to_tsvector('jiebacfg', '是拖拉机学院手扶拖拉机专业的。不用多久，我就会升职加薪，当上CEO，走上人生巅峰。');
                                             to_tsvector
@@ -160,6 +130,37 @@ jieba=# select * from ts_debug('jiebacfg', '是拖拉机学院手扶拖拉机专
  t     | time          | 当上       | {jieba_stem} | jieba_stem | {当上}
 (17 rows)
 ```
+
+#### Here is alternative configs;
+* **jiebamp:** Use mp
+* **jiebahmm:** Use hmm
+* **jiebacfg:** Combine MP&HMM(Mix). Used in most situation (Recommand)
+* **jiebaqry:** First use Mix, then use full. Similar to the one used by web search engines.
+
+| Config   | Statment                                             | Result                                                       |
+| -------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| jiebamp  | 我来到北京清华大学                                   | '来到' & '北京' & '清华大学'                                 |
+| jiebamp  | 他来到了网易杭研大厦                                 | '来到' & '网易' & '杭' & '研' & '大厦'                       |
+| jiebamp  | 小明硕士毕业于中国科学院计算所，后在日本京都大学深造 | '明' & '硕士' & '毕业' & '中国科学院' & '计算所' & '日本京都大学' & '深造' |
+
+| Config   | Statment                                             | Result                                                       |
+| -------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| jiebahmm | 我来到北京清华大学                                   | '我来' & '北京' & '清华大学'                                 |
+| jiebahmm | 他来到了网易杭研大厦                                 | '他来' & '网易' & '杭' & '研大厦'                            |
+| jiebahmm | 小明硕士毕业于中国科学院计算所，后在日本京都大学深造 | '小明' & '硕士' & '毕业于' & '中国' & '科学院' & '计算' & '日' & '本京' & '大学' & '深造' |
+
+| Config   | Statment                                             | Result                                                       |
+| -------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| jiebacfg | 我来到北京清华大学                                   | '来到' & '北京' & '清华大学'                                 |
+| jiebacfg | 他来到了网易杭研大厦                                 | '来到' & '网易' & '杭研' & '大厦'                            |
+| jiebacfg | 小明硕士毕业于中国科学院计算所，后在日本京都大学深造 | '小明' & '硕士' & '毕业' & '中国科学院' & '计算所' & '日本京都大学' & '深造' |
+
+| Config   | Statment                                             | Result                                                       |
+| -------- | ---------------------------------------------------- | ------------------------------------------------------------ |
+| jiebaqry | 我来到北京清华大学                                   | '来到' & '北京' & '清华' & '华大' & '大学' & '清华大学'      |
+| jiebaqry | 他来到了网易杭研大厦                                 | '来到' & '网易' & '杭研' & '大厦'                            |
+| jiebaqry | 小明硕士毕业于中国科学院计算所，后在日本京都大学深造 | '小明' & '硕士' & '毕业' & '中国' & '科学' & '学院' & '科学院' & '中国科学院' & '计算' & '计算所' & '日本' & '京都' & '大学' & '日本京都大学' & '深造' |
+
 
 ## USER DEFINED DICTIONARY
 #### Dictionary Format
@@ -207,7 +208,7 @@ You can test for result by [test link] (Suggest opened by Chrome)
 [history]
 
 ## Package Dependency
-  
+
 * cppjieba v5.0.0
 
 ## THANKS
