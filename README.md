@@ -199,12 +199,18 @@ Reference `jieba_user.dict`
 The following configuration options are available to add into postgresql.conf
 
 + **pg_jieba.hmm_model** (Need Restart)
-HMM Model file.
+  HMM Model file.
 + **pg_jieba.base_dict** (Need Restart)
-Base dictionary.
+  Base dictionary.
 + **pg_jieba.user_dict** (Need Restart)
-csv list of specific user dictionary name(Exclude suffix `.dict`).
-All should located in dir `tsearch_data`.
+  csv list of specific user dictionary name(Exclude suffix `.dict`).
+  All should located in dir `tsearch_data`.
+
+#### Postgresql parameter
+```sh
+# default_text_search_config='pg_catalog.simple'; default value
+# default_text_search_config='jiebacfg'; uncomment to make 'jiebacfg' as default
+```
 
 ## Online Test
 You can test for result by [test link] (Suggest opened by Chrome)
