@@ -225,8 +225,8 @@ You can test for result by [test link] (Suggest opened by Chrome)
 
 ## THANKS
 
-[jieba] project by SunJunyi
-[CppJieba] project by WuYanyi
+[jieba] project by SunJunyi  
+[CppJieba] project by WuYanyi  
 
 [history]:https://github.com/jaiminpan/pg_jieba/blob/master/HISTORY
 [test link]:http://cppjieba-webdemo.herokuapp.com/
