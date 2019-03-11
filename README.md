@@ -196,7 +196,8 @@ Reference `jieba_user.dict`
 
 
 ## Parameter
-The following configuration options are available to add into postgresql.conf
+When `pg_jieba` loaded by `shared_preload_libraries`,
+The following configuration options are available and can be added into postgresql.conf
 
 + **pg_jieba.hmm_model** (Need Restart)
   HMM Model file.
@@ -208,6 +209,8 @@ The following configuration options are available to add into postgresql.conf
 
 #### Postgresql parameter
 ```sh
+# shared_preload_libraries = 'pg_jieba.so'  # (change requires restart)
+
 # default_text_search_config='pg_catalog.simple'; default value
 # default_text_search_config='jiebacfg'; uncomment to make 'jiebacfg' as default
 ```
