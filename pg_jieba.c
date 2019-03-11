@@ -70,6 +70,7 @@ Datum jieba_lextype(PG_FUNCTION_ARGS);
 #define DICT_EXT "dict"
 #define MODEL_EXT "model"
 
+static void DefineCustomConfigVariables();
 static void recompute_dicts_path(void);
 static char* extract_dict_list(const char *dictsString);
 static char* jieba_get_tsearch_config_filename(const char *basename, const char *extension);
@@ -77,9 +78,9 @@ static char* jieba_get_tsearch_config_filename(const char *basename, const char 
 static JiebaCtx* jieba = NULL;
 
 /* GUC variables */
-static char *pg_jieba_hmm_model = NULL;
-static char *pg_jieba_dict = NULL;
-static char *pg_jieba_user_dict = NULL;
+static char *pg_jieba_hmm_model = "jieba_hmm";
+static char *pg_jieba_dict = "jieba_base";
+static char *pg_jieba_user_dict = "jieba_user";
 
 /* These variables are the values last set */
 static char *userDicts = NULL;
@@ -97,35 +98,16 @@ static void assign_user_dict(const char *newval, void *extra);
 void
 _PG_init(void)
 {
-	DefineCustomStringVariable("pg_jieba.hmm_model",
-							"hmm model file.",
-							NULL,
-							&pg_jieba_hmm_model,
-							"jieba_hmm",
-							PGC_POSTMASTER, 0,
-							NULL,
-							NULL,
-							NULL);
-
-	DefineCustomStringVariable("pg_jieba.base_dict",
-							"base dictionary.",
-							NULL,
-							&pg_jieba_dict,
-							"jieba_base",
-							PGC_POSTMASTER, 0,
-							NULL,
-							NULL,
-							NULL);
-
-	DefineCustomStringVariable("pg_jieba.user_dict",
-							"CSV list of specific user dictionary.",
-							NULL,
-							&pg_jieba_user_dict,
-							"jieba_user",
-							PGC_POSTMASTER, 0,
-							check_user_dict,
-							assign_user_dict,
-							NULL);
+	if (!process_shared_preload_libraries_in_progress)
+	{
+		ereport(LOG,
+				(errmsg("pg_jieba Extension is not loaded by shared_preload_libraries, "
+						"Variables can't be configured")));
+	}
+	else
+	{
+		DefineCustomConfigVariables();
+	}
 
 	userDictsValid = false;
 	recompute_dicts_path();
@@ -259,6 +241,40 @@ jieba_lextype(PG_FUNCTION_ARGS)
 	descr[size].lexid = 0;
 
 	PG_RETURN_POINTER(descr);
+}
+
+static void
+DefineCustomConfigVariables()
+{
+	DefineCustomStringVariable("pg_jieba.hmm_model",
+							"hmm model file.",
+							NULL,
+							&pg_jieba_hmm_model,
+							"jieba_hmm",
+							PGC_POSTMASTER, 0,
+							NULL,
+							NULL,
+							NULL);
+
+	DefineCustomStringVariable("pg_jieba.base_dict",
+							"base dictionary.",
+							NULL,
+							&pg_jieba_dict,
+							"jieba_base",
+							PGC_POSTMASTER, 0,
+							NULL,
+							NULL,
+							NULL);
+
+	DefineCustomStringVariable("pg_jieba.user_dict",
+							"CSV list of specific user dictionary.",
+							NULL,
+							&pg_jieba_user_dict,
+							"jieba_user",
+							PGC_POSTMASTER, 0,
+							check_user_dict,
+							assign_user_dict,
+							NULL);
 }
 
 static void
