@@ -25,7 +25,7 @@
 PG_MODULE_MAGIC;
 
 /* Start From 1 and LASTNUM is the last number */
-int LASTNUM = sizeof(tok_alias) / sizeof(tok_alias[0]);
+int LASTNUM = sizeof(lex_descr) / sizeof(lex_descr[0]);
 
 /*
  * types
@@ -234,8 +234,8 @@ jieba_lextype(PG_FUNCTION_ARGS)
 	for (i = 1; i <= size; i++)
 	{
 		descr[i - 1].lexid = i;
-		descr[i - 1].alias = pstrdup(tok_alias[i]);
-		descr[i - 1].descr = pstrdup(lex_descr[i]);
+		descr[i - 1].alias = pstrdup(lex_descr[i].token);
+		descr[i - 1].descr = pstrdup(lex_descr[i].descr);
 	}
 
 	descr[size].lexid = 0;

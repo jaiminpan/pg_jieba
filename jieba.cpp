@@ -59,9 +59,9 @@ Jieba_New(const char* dict_path, const char* model_path, const char* user_dict_p
 	ctx->mp_seg_ = new MPSegment(ctx->dict_trie_);
 	ctx->hmm_seg_ = new HMMSegment(ctx->hmm_model_);
 
-	int num_types = sizeof(tok_alias) / sizeof(tok_alias[0]);
+	int num_types = sizeof(lex_descr) / sizeof(lex_descr[0]);
 	for (auto i = 1; i < num_types; ++i) {
-		ctx->lex_id_.insert({tok_alias[i], i});
+		ctx->lex_id_.insert({lex_descr[i].token, i});
 	}
 
 	return ctx;
