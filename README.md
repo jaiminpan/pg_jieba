@@ -89,13 +89,13 @@ HOW TO USE & EXAMPLE
   jieba=# select * from to_tsquery('jiebacfg', '是拖拉机学院手扶拖拉机专业的。不用多久，我就会升职加薪，当上CEO，走上人生巅峰。');
                                           to_tsquery
 -----------------------------------------------------------------------------------------------
- '拖拉机' & '学院' & '手扶拖拉机' & '专业' & '不用' & '多久' & '会' & '升职' & '加薪' & '当上'
+ '拖拉机' & '学院' & '手扶拖拉机' & '专业' & '不用' & '多久' & '会' & '升职' & '加薪' & '当上' & 'ceo' & '走上' & '人生' & '巅峰'
 (1 row)
 
   jieba=# select * from to_tsvector('jiebacfg', '是拖拉机学院手扶拖拉机专业的。不用多久，我就会升职加薪，当上CEO，走上人生巅峰。');
                                             to_tsvector
 -----------------------------------------------------------------------------------------------------
- '不用':8 '专业':5 '会':13 '加薪':15 '升职':14 '多久':9 '学院':3 '当上':17 '手扶拖拉机':4 '拖拉机':2
+ 'ceo':18 '不用':8 '专业':5 '人生':21 '会':13 '加薪':15 '升职':14 '多久':9 '学院':3 '巅峰':22 '当上':17 '手扶拖拉机':4 '拖拉机':2 '走上':20
 (1 row)
   ```
 
@@ -104,14 +104,14 @@ HOW TO USE & EXAMPLE
 jieba=# select * from ts_token_type('jieba');
  tokid | alias |         description
 -------+-------+-----------------------------
-     1 | nz    | other proper noun
-     2 | n     | noun
-     3 | m     | numeral
+     1 | eng   | letter
+     2 | nz    | other proper noun
+     3 | n     | noun
 ... ...
 ... ...
-    54 | ug    | ug
-    55 | rz    | rz
-    56 |       |
+    55 | ug    | ug
+    56 | rz    | rz
+    57 |       |
 (56 rows)
 
 jieba=# select * from ts_debug('jiebacfg', '是拖拉机学院手扶拖拉机专业的。不用多久，我就会升职加薪，当上CEO，走上人生巅峰。');
@@ -134,7 +134,12 @@ jieba=# select * from ts_debug('jiebacfg', '是拖拉机学院手扶拖拉机专
  nr    | person's name | 加薪       | {jieba_stem} | jieba_stem | {加薪}
  x     | unknown       | ，         | {jieba_stem} | jieba_stem | {}
  t     | time          | 当上       | {jieba_stem} | jieba_stem | {当上}
-(17 rows)
+ eng   | letter        | CEO        | {jieba_stem} | jieba_stem | {ceo}
+ x     | unknown       | ，         | {jieba_stem} | jieba_stem | {}
+ v     | verb          | 走上       | {jieba_stem} | jieba_stem | {走上}
+ n     | noun          | 人生       | {jieba_stem} | jieba_stem | {人生}
+ n     | noun          | 巅峰       | {jieba_stem} | jieba_stem | {巅峰}
+ x     | unknown       | 。         | {jieba_stem} | jieba_stem | {}
 ```
 
 #### Here is alternative configs;
