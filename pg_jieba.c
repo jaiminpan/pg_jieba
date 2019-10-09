@@ -25,7 +25,7 @@
 PG_MODULE_MAGIC;
 
 /* Start From 1 and LASTNUM is the last number */
-int LASTNUM = sizeof(lex_descr) / sizeof(lex_descr[0]);
+int LASTNUM = sizeof(lex_descr) / sizeof(lex_descr[0]) - 1;
 
 /*
  * types

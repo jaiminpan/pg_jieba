@@ -1,4 +1,4 @@
 comment = 'a parser for full-text search of Chinese'
-default_version = '1.1.0'
+default_version = '1.1.1'
 module_pathname = '$libdir/pg_jieba'
 relocatable = true
