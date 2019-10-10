@@ -231,6 +231,14 @@ You can test for result by [test link] (Suggest opened by Chrome)
 
 * cppjieba v5.0.0
 
+## Docker
+There is [docker file] by @ssfdust.
+```sh
+# scripts
+docker run --name testjieba -e POSTGRES_PASSWORD=passwd -e POSTGRES_USER=test -e POSTGRES_DB=testdb -d ssfdust/psql_jieba_swsc
+docker exec -ti testjieba psql -U test testdb
+```
+
 ## THANKS
 
 [jieba] project by SunJunyi  
@@ -241,3 +249,4 @@ You can test for result by [test link] (Suggest opened by Chrome)
 [dict.367W.utf8]:https://github.com/qinwf/BigDict
 [CppJieba]:https://github.com/yanyiwu/cppjieba
 [jieba]:https://github.com/fxsjy/jieba
+[docker file]:https://cloud.docker.com/repository/docker/ssfdust/psql_jieba_swsc/general
