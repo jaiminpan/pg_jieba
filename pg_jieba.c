@@ -66,6 +66,9 @@ Datum jieba_end(PG_FUNCTION_ARGS);
 PG_FUNCTION_INFO_V1(jieba_lextype);
 Datum jieba_lextype(PG_FUNCTION_ARGS);
 
+PG_FUNCTION_INFO_V1(jieba_reload_dict);
+Datum jieba_reload_dict(PG_FUNCTION_ARGS);
+
 
 #define DICT_EXT "dict"
 #define MODEL_EXT "model"
@@ -241,6 +244,14 @@ jieba_lextype(PG_FUNCTION_ARGS)
 	descr[size].lexid = 0;
 
 	PG_RETURN_POINTER(descr);
+}
+
+Datum
+jieba_reload_dict(PG_FUNCTION_ARGS)
+{
+    userDictsValid = false;
+    recompute_dicts_path();
+	PG_RETURN_VOID();
 }
 
 static void

@@ -33,6 +33,11 @@ RETURNS internal
 AS 'MODULE_PATHNAME'
 LANGUAGE C STRICT;
 
+CREATE FUNCTION jieba_reload_dict()
+RETURNS void
+AS 'MODULE_PATHNAME'
+LANGUAGE C STRICT;
+
 CREATE TEXT SEARCH PARSER jieba (
 	START    = jieba_start,
 	GETTOKEN = jieba_gettoken,
