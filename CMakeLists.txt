@@ -14,7 +14,7 @@ if(NOT PostgreSQL_FOUND)
 endif(NOT PostgreSQL_FOUND)
 
 
-include_directories(${PostgreSQL_INCLUDE_DIRS})
+include_directories(${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_TYPE_INCLUDE_DIR})
 link_directories(${PostgreSQL_LIBRARY_DIRS})
 
 set(CPPJIEBA_DIR "libjieba")
