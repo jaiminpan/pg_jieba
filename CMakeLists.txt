@@ -14,11 +14,11 @@ if(NOT PostgreSQL_FOUND)
 endif(NOT PostgreSQL_FOUND)
 
 
-include_directories(${PostgreSQL_INCLUDE_DIRS})
+include_directories(${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_TYPE_INCLUDE_DIR})
 link_directories(${PostgreSQL_LIBRARY_DIRS})
 
 set(CPPJIEBA_DIR "libjieba")
-INCLUDE_DIRECTORIES(${CPPJIEBA_DIR}/deps ${CPPJIEBA_DIR}/include)
+INCLUDE_DIRECTORIES(${CPPJIEBA_DIR}/deps ${CPPJIEBA_DIR}/include ${CPPJIEBA_DIR}/deps/limonp/include)
 
 set(SOURCE_FILES pg_jieba.c jieba.cpp)
 
