@@ -1,6 +1,6 @@
 Release notes for all versions of pg_jieba can be found following
 =============
-
+# update libjieba to v5.1
 
 # pg_jieba v2.0.0 released
 Use sub-module to manager the cppjieba source code

@@ -229,7 +229,7 @@ You can test for result by [test link] (Suggest opened by Chrome)
 
 ## Package Dependency
 
-* cppjieba v5.0.0
+* cppjieba v5.1
 
 ## Docker
 There is [docker file] by @ssfdust.
