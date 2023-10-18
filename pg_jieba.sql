@@ -85,7 +85,11 @@ COMMENT ON TEXT SEARCH CONFIGURATION jiebahmm IS 'Hmm segmentation configuration
 CREATE TEXT SEARCH DICTIONARY jieba_stem (TEMPLATE=simple, stopwords = 'jieba');
 COMMENT ON TEXT SEARCH DICTIONARY jieba_stem IS 'jieba dictionary: lower case and check for stopword which including Unicode symbols that are mainly Chinese characters and punctuations';
 
-ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
-ALTER TEXT SEARCH CONFIGURATION jiebaqry ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
-ALTER TEXT SEARCH CONFIGURATION jiebamp ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
-ALTER TEXT SEARCH CONFIGURATION jiebahmm ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,x,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR eng WITH english_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebacfg ADD MAPPING FOR eng,nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebaqry ADD MAPPING FOR eng WITH english_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebaqry ADD MAPPING FOR nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebamp ADD MAPPING FOR eng WITH english_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebamp ADD MAPPING FOR nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebahmm ADD MAPPING FOR eng WITH english_stem;
+ALTER TEXT SEARCH CONFIGURATION jiebahmm ADD MAPPING FOR nz,n,m,i,l,d,s,t,mq,nr,j,a,r,b,f,nrt,v,z,ns,q,vn,c,nt,u,o,zg,nrfg,df,p,g,y,ad,vg,ng,ul,k,ag,dg,rr,rg,an,vq,e,uv,tg,mg,ud,vi,vd,uj,uz,h,ug,rz WITH jieba_stem;
