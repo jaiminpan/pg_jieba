@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 set(CMAKE_COLOR_MAKEFILE ON)
 
@@ -8,13 +8,27 @@ project("${PG_JIEBA_PROJECT_ID}")
 
 message(STATUS "Setting ${CMAKE_PROJECT_NAME} build type - ${CMAKE_BUILD_TYPE}")
 
+if(APPLE)
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@16")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@15")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@14")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@13")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@12")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@11")
+    list(APPEND CMAKE_FIND_ROOT_PATH "/opt/homebrew/opt/postgresql@10")
+endif(APPLE)
+
 find_package(PostgreSQL REQUIRED)
 if(NOT PostgreSQL_FOUND)
     message(FATAL_ERROR " Please check your PostgreSQL installation.")
 endif(NOT PostgreSQL_FOUND)
 
+find_package(Intl REQUIRED)
+if(NOT Intl_FOUND)
+    message(FATAL_ERROR " Please check your gettext installation.")
+endif(NOT Intl_FOUND)
 
-include_directories(${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_TYPE_INCLUDE_DIR})
+include_directories(${PostgreSQL_INCLUDE_DIRS} ${PostgreSQL_TYPE_INCLUDE_DIR} ${Intl_INCLUDE_DIRS})
 link_directories(${PostgreSQL_LIBRARY_DIRS})
 
 set(CPPJIEBA_DIR "libjieba")
@@ -92,8 +106,10 @@ string(REGEX REPLACE "([0-9]+)\\.([0-9]+)\\.([0-9]+)" "\\3"
 
 if(APPLE)
     set(LIBRARY_MODE_TARGET "MODULE")
+    set(LIBRARY_EXTENSION_NAME ".dylib")
 else(APPLE)
     set(LIBRARY_MODE_TARGET "SHARED")
+    set(LIBRARY_EXTENSION_NAME ".so")
 endif(APPLE)
 
 add_library(${PG_JIEBA_LIBRARY_NAME} ${LIBRARY_MODE_TARGET} ${SOURCE_FILES})
@@ -103,11 +119,12 @@ set_target_properties("${PG_JIEBA_LIBRARY_NAME}" PROPERTIES
                       CXX_STANDARD_REQUIRED YES
                       CXX_EXTENSIONS NO
                       POSITION_INDEPENDENT_CODE ON
-                      PREFIX "")
+                      PREFIX ""
+                      SUFFIX "${LIBRARY_EXTENSION_NAME}")
 if(APPLE)
     set_target_properties(${PG_JIEBA_LIBRARY_NAME}
                           PROPERTIES
-                          LINK_FLAGS "-flat_namespace -undefined suppress")
+                          LINK_FLAGS "-flat_namespace -undefined dynamic_lookup")
 endif(APPLE)
 if(WIN32 AND MSVC)
     set_target_properties(${PG_JIEBA_LIBRARY_NAME} PROPERTIES PREFIX "lib")
